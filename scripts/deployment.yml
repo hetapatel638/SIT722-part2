@@ -1,38 +1,40 @@
-# Write Kubernetes Deployment Script
+#define a Kubernetes Deployment and Service to run
+#your book-catelog app in a Kubernetes cluster. The app will be exposed on port 80 via a nodeport.
+ 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-app-deployment
-  labels:
-    app: fastapi-app
+  name: book-catelog
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: fastapi-app
+      app: book-catelog
   template:
     metadata:
       labels:
-        app: fastapi-app
+        app: book-catelog
     spec:
       containers:
-      - name: fastapi-app-container
-        image: your-dockerhub-username/fastapi-app:latest
+      - name: book-catelog
+        image: book-catelog:1
         ports:
-        - containerPort: 80
+        - containerPort: 8000
+        imagePullPolicy: Never
         env:
         - name: DATABASE_URL
-          value: "your-database-url"
+          value: "postgresql://week06_5gcb_user:CqZo6hkVFgHL7I5lyhjFhRGX4PcKayfN@dpg-crejge3v2p9s73cvq2t0-a.oregon-postgres.render.com/week06_5gcb"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: fastapi-app-service
+  name: book-catelog
 spec:
   selector:
-    app: fastapi-app
+    app: book-catelog
+  type: NodePort
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: LoadBalancer
+      port: 8000
+      targetPort: 8000
+      nodePort: 30000
